@@ -7,6 +7,7 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { router } from "expo-router";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -18,7 +19,10 @@ const Login = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
       <Formik
-        initialValues={{ email: "", password: "" }}
+        initialValues={{
+          email: "zouyedhafed00@gmail.com",
+          password: "00000000",
+        }}
         validationSchema={LoginSchema}
         onSubmit={(values) => {
           console.log(values);
