@@ -8,6 +8,10 @@ import {
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { registerUser } from "../(services)/api/api";
+import { router } from "expo-router";
 
 const RegisterSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -18,24 +22,31 @@ const RegisterSchema = Yup.object().shape({
 });
 
 const Register = () => {
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: registerUser,
+    mutationKey: ["register"],
+  });
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
-      {/* {mutation?.isError ? (
+      {mutation?.isError ? (
         <Text style={styles.errorText}>
           {mutation?.error?.response?.data?.message}
         </Text>
-      ) : null} */}
-      {/* {mutation?.isSuccess ? (
+      ) : null}
+      {mutation?.isSuccess ? (
         <Text style={styles.successText}>
           {mutation?.error?.response?.data?.message}
         </Text>
-      ) : null} */}
+      ) : null}
       <Formik
         initialValues={{
-          email: "",
-          password: "",
-          confirmPassword: "",
+          email: "zouyedhafed00@gmail.com",
+          password: "00000000",
+          confirmPassword: "00000000",
         }}
         validationSchema={RegisterSchema}
         onSubmit={(values) => {
@@ -43,7 +54,20 @@ const Register = () => {
             email: values.email,
             password: values.password,
           };
-          console.log(data);
+          mutation
+            .mutateAsync(data)
+            .then(() => {
+              setMessage("Registration successful!");
+              setMessageType("success");
+              setTimeout(() => {
+                setMessage("");
+                router.push("/(tabs)");
+              }, 2000); // Redirect after 2 seconds
+            })
+            .catch((error) => {
+              setMessage(error?.response?.data?.message);
+              setMessageType("error");
+            });
         }}
       >
         {({
@@ -91,9 +115,13 @@ const Register = () => {
             <TouchableOpacity
               style={styles.button}
               onPress={handleSubmit}
-              // disabled={mutation.isLoading}
+              disabled={mutation.isLoading}
             >
-              <Text style={styles.buttonText}>Register</Text>
+              {mutation.isPending ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Register</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -149,5 +177,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  successText: {
+    color: "green",
+    marginBottom: 16,
   },
 });

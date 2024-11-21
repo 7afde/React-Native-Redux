@@ -4,10 +4,14 @@ import {
   TextInput,
   Text,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { router } from "expo-router";
+import { useMutation } from "@tanstack/react-query";
+import { loginUser } from "../(services)/api/api";
+import { useState } from "react";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -15,9 +19,28 @@ const LoginSchema = Yup.object().shape({
 });
 
 const Login = () => {
+  const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("");
+  const mutation = useMutation({
+    mutationFn: loginUser,
+    mutationKey: ["login"],
+  });
+
+  console.log(mutation);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Login</Text>
+      {mutation?.isError ? (
+        <Text style={styles.errorText}>
+          {mutation?.error?.response?.data?.message}
+        </Text>
+      ) : null}
+      {mutation?.isSuccess ? (
+        <Text style={styles.successText}>
+          {mutation?.error?.response?.data?.message}
+        </Text>
+      ) : null}
       <Formik
         initialValues={{
           email: "zouyedhafed00@gmail.com",
@@ -25,8 +48,24 @@ const Login = () => {
         }}
         validationSchema={LoginSchema}
         onSubmit={(values) => {
-          console.log(values);
-          router.push("/(tabs)");
+          const data = {
+            email: values.email,
+            password: values.password,
+          };
+          mutation
+            .mutateAsync(data)
+            .then(() => {
+              setMessage("Registration successful!");
+              setMessageType("success");
+              setTimeout(() => {
+                setMessage("");
+                router.push("/(tabs)");
+              }, 2000); // Redirect after 2 seconds
+            })
+            .catch((error) => {
+              setMessage(error?.response?.data?.message);
+              setMessageType("error");
+            });
         }}
       >
         {({
@@ -60,8 +99,16 @@ const Login = () => {
             {errors.password && touched.password ? (
               <Text style={styles.errorText}>{errors.password}</Text>
             ) : null}
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Login</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleSubmit}
+              disabled={mutation.isLoading}
+            >
+              {mutation.isPending ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Login</Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
@@ -113,5 +160,9 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  successText: {
+    color: "green",
+    marginBottom: 16,
   },
 });

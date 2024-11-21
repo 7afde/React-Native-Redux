@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // Login
-const loginUser = async (email, password) => {
+const loginUser = async ({ email, password }) => {
   const response = await axios.post(
     "https://red-eggs-begin.loca.lt/api/users/login",
     { email, password }
@@ -10,7 +10,7 @@ const loginUser = async (email, password) => {
 };
 
 // Register
-const registerUser = async (email, password) => {
+const registerUser = async ({ email, password }) => {
   const response = await axios.post(
     "https://red-eggs-begin.loca.lt/api/users/register",
     { email, password }
