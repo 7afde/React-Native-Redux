@@ -1,16 +1,15 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
 import queryClient from "./(services)/queryClient";
+import AppWrapper from "./(redux)/AppWrapper";
+import { Provider } from "react-redux";
+import { store } from "./(redux)/store";
 
 export default function RootLayout() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Stack>
-        <Stack.Screen
-          name="index"
-          options={{ title: "Home", headerShown: false }}
-        />
-      </Stack>
-    </QueryClientProvider>
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <AppWrapper />
+      </QueryClientProvider>
+    </Provider>
   );
 }

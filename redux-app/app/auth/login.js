@@ -12,6 +12,8 @@ import { router } from "expo-router";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "../(services)/api/api";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUserAction } from "../(redux)/authSlice";
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
@@ -26,7 +28,10 @@ const Login = () => {
     mutationKey: ["login"],
   });
 
-  console.log(mutation);
+  // dispatching the loginUser mutation
+  const dispatch = useDispatch();
+
+  useSelector((state) => console.log("store data", state));
 
   return (
     <View style={styles.container}>
@@ -37,9 +42,7 @@ const Login = () => {
         </Text>
       ) : null}
       {mutation?.isSuccess ? (
-        <Text style={styles.successText}>
-          {mutation?.error?.response?.data?.message}
-        </Text>
+        <Text style={styles.successText}>{message}</Text>
       ) : null}
       <Formik
         initialValues={{
@@ -55,12 +58,13 @@ const Login = () => {
           mutation
             .mutateAsync(data)
             .then(() => {
+              dispatch(loginUserAction(data));
               setMessage("Registration successful!");
               setMessageType("success");
               setTimeout(() => {
                 setMessage("");
                 router.push("/(tabs)");
-              }, 2000); // Redirect after 2 seconds
+              }, 1000); // Redirect after 2 seconds
             })
             .catch((error) => {
               setMessage(error?.response?.data?.message);
