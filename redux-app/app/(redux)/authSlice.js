@@ -14,6 +14,7 @@ const loadUserFromStorage = async () => {
 // Initial state
 const initialState = {
   user: null,
+  isLoading: true,
 };
 
 // Slice
@@ -23,6 +24,7 @@ const authSlice = createSlice({
   reducers: {
     loginUserAction(state, action) {
       state.user = action.payload;
+      state.isLoading = false;
       AsyncStorage.setItem("userInfo", JSON.stringify(action.payload));
     },
     logoutUserAction(state) {
@@ -31,6 +33,7 @@ const authSlice = createSlice({
     },
     setUserAction(state, action) {
       state.user = action.payload;
+      state.isLoading = false;
     },
   },
 });

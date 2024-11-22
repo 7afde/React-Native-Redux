@@ -1,31 +1,32 @@
+import { router } from "expo-router";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUserAction } from "../(redux)/authSlice";
+import ProtectedRoute from "../../components/ProtectedRoute";
 
 export default function Profile() {
-  // const router = useRouter();
-  // const dispatch = useDispatch();
-  // const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
 
-  // const handleLogout = () => {
-  //   dispatch(logoutAction());
-  //   router.push("/auth/login");
-  // };
+  const handleLogout = () => {
+    dispatch(logoutUserAction());
+    router.push("/auth/login");
+  };
 
   return (
-    // <ProtectedRoute>
     <View style={styles.container}>
       <Text style={styles.title}>User Profile</Text>
-      {/* {user ? (
-          <>
-            <Text style={styles.text}>Email: {user.email}</Text>
-            <TouchableOpacity style={styles.button} onPress={handleLogout}>
-              <Text style={styles.buttonText}>Logout</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <Text style={styles.text}>No user logged in</Text>
-        )} */}
+      {user ? (
+        <>
+          <Text style={styles.text}>Email: {user.email}</Text>
+          <TouchableOpacity style={styles.button} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Logout</Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <Text style={styles.text}>No user logged in</Text>
+      )}
     </View>
-    // </ProtectedRoute>
   );
 }
 
